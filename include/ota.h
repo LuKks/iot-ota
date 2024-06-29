@@ -7,6 +7,10 @@ extern "C" {
 
 #include "../src/root_ca.h"
 
+#include <stdbool.h>
+
+#include <esp_err.h>
+
 #define OTA_ROOT_CA \
   OTA_ROOT_CA_LETS_ENCRYPT_R3 \
   OTA_ROOT_CA_GOOGLE_R1

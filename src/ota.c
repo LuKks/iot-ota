@@ -1,6 +1,8 @@
 #include "../include/ota.h"
 
 #include "internal.h"
+#include "log.h"
+#include "nvs.h"
 
 #include <ctype.h>
 #include <esp_http_client.h>
@@ -14,7 +16,6 @@
 
 char *ota_server = OTA_DEFAULT_SERVER;
 char *ota_device_key = NULL;
-bool _ota_verbose = false;
 
 void
 ota_init (const char *key) {
@@ -48,17 +49,22 @@ ota_check (const char *firmware_id) {
 
   ota_log("OTA check, status code: %d", status_code);
 
-  switch (status_code) {
-  case OTA_STATUS_UP_TO_DATE:
-    break;
+  if (status_code == OTA_STATUS_NOT_FOUND) {
+    ota_log("No new firmware available (404)");
+    goto done;
+  }
 
-  case OTA_STATUS_AVAILABLE:
+  if (status_code == OTA_STATUS_UP_TO_DATE) {
+    goto done;
+  }
+
+  if (status_code == OTA_STATUS_AVAILABLE) {
     char new_hash[64 + 1] = {0};
     int read_len = esp_http_client_read_response(client, new_hash, sizeof(new_hash) - 1);
 
     if (read_len < 0) {
       ota_log("Failed to read response");
-      break;
+      goto done;
     }
 
     new_hash[read_len] = '\0';
@@ -69,7 +75,7 @@ ota_check (const char *firmware_id) {
 
     if (err_download != ESP_OK) {
       ota_log("OTA failed to update: %d", err_download);
-      break;
+      goto done;
     }
 
     ota_nvs_write_string("ota", "hash", new_hash);
@@ -77,16 +83,10 @@ ota_check (const char *firmware_id) {
     // TODO: Allow manual restart to avoid interruption, and timeout to force it
     esp_restart();
 
-    break;
-
-  case OTA_STATUS_NOT_FOUND:
-    ota_log("No new firmware available (404)");
-    break;
-
-  default:
-    ota_log("Got unexpected status code %d", status_code);
-    break;
+    goto done;
   }
+
+  ota_log("Got unexpected status code %d", status_code);
 
   goto done;
 

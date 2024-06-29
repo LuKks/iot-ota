@@ -9,10 +9,10 @@ void
 ota_nvs_init ();
 
 void
-ota_nvs_write_string (const char *namespace, const char *key, const char *value);
+ota_nvs_write_string (const char *space, const char *key, const char *value);
 
 char *
-ota_nvs_read_string (const char *namespace, const char *key);
+ota_nvs_read_string (const char *space, const char *key);
 
 #ifdef __cplusplus
 }

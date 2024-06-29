@@ -1,3 +1,15 @@
+#include "nvs.h"
+
+#include <ctype.h>
+#include <esp_http_client.h>
+#include <esp_https_ota.h>
+#include <esp_log.h>
+#include <esp_system.h>
+#include <nvs_flash.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/param.h>
+
 // TODO: Stop using ESP_ERROR_CHECK everywhere due abort()
 
 void
@@ -13,12 +25,12 @@ ota_nvs_init () {
 }
 
 void
-ota_nvs_write_string (const char *namespace, const char *key, const char *value) {
-  nvs_init();
+ota_nvs_write_string (const char *space, const char *key, const char *value) {
+  ota_nvs_init();
 
   nvs_handle_t nvs;
 
-  ESP_ERROR_CHECK(nvs_open(namespace, NVS_READWRITE, &nvs));
+  ESP_ERROR_CHECK(nvs_open(space, NVS_READWRITE, &nvs));
   ESP_ERROR_CHECK(nvs_set_str(nvs, key, value));
   ESP_ERROR_CHECK(nvs_commit(nvs));
   nvs_close(nvs);
@@ -27,12 +39,12 @@ ota_nvs_write_string (const char *namespace, const char *key, const char *value)
 }
 
 char *
-ota_nvs_read_string (const char *namespace, const char *key) {
-  nvs_init();
+ota_nvs_read_string (const char *space, const char *key) {
+  ota_nvs_init();
 
   nvs_handle_t nvs;
 
-  ESP_ERROR_CHECK(nvs_open(namespace, NVS_READONLY, &nvs));
+  ESP_ERROR_CHECK(nvs_open(space, NVS_READONLY, &nvs));
 
   size_t size;
   esp_err_t err = nvs_get_str(nvs, key, NULL, &size);
