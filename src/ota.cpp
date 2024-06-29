@@ -1,5 +1,7 @@
 #include "../include/ota.h"
 
+#include "internal.h"
+
 #include <ctype.h>
 #include <esp_http_client.h>
 #include <esp_https_ota.h>
@@ -9,11 +11,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/param.h>
-
-#define OTA_MAX_LENGTH_FIRMWARE_ID   26
-#define OTA_MAX_LENGTH_FIRMWARE_HASH 64
-#define OTA_MAX_LENGTH_SERVER_URL    128
-#define OTA_MAX_URL_LENGTH           (OTA_MAX_LENGTH_FIRMWARE_ID + OTA_MAX_LENGTH_FIRMWARE_HASH + OTA_MAX_LENGTH_SERVER_URL)
 
 char *ota_server = OTA_DEFAULT_SERVER;
 char *ota_device_key = NULL;
@@ -66,7 +63,9 @@ ota_check (const char *firmware_id) {
 
     new_hash[read_len] = '\0';
 
-    esp_err_t err_download = _ota_download(firmware_id, new_hash);
+    snprintf(url, sizeof(url), "%s/v1/download/%s/%s", ota_server, firmware_id, new_hash);
+
+    esp_err_t err_download = ota_update(url);
 
     if (err_download != ESP_OK) {
       ota_log("OTA failed to update: %d", err_download);
@@ -95,17 +94,8 @@ done:
   esp_http_client_cleanup(client);
 }
 
-void
-ota_verbose (bool state) {
-  _ota_verbose = state;
-}
-
 esp_err_t
-_ota_download (char *firmware_id, char *new_hash) {
-  char url[OTA_MAX_URL_LENGTH];
-
-  snprintf(url, sizeof(url), "%s/v1/download/%s/%s", ota_server, firmware_id, new_hash);
-
+ota_update (const char *url) {
   esp_http_client_config_t config = {
     .url = url,
     .cert_pem = OTA_ROOT_CA,
@@ -119,6 +109,11 @@ _ota_download (char *firmware_id, char *new_hash) {
 
   // TODO: Use the advanced OTA APIs
   return esp_https_ota(&ota_config);
+}
+
+void
+ota_verbose (bool state) {
+  _ota_verbose = state;
 }
 
 esp_err_t

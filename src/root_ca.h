@@ -1,8 +1,6 @@
 #ifndef OTA_ROOT_CA_H
 #define OTA_ROOT_CA_H
 
-// TODO: Optimize memory usage from strings, probably embed byte arrays
-
 // Let's Encrypt (R3)
 #define OTA_ROOT_CA_LETS_ENCRYPT_R3 "-----BEGIN CERTIFICATE-----\n" \
                                     "MIIFFjCCAv6gAwIBAgIRAJErCErPDBinU/bWLiWnX1owDQYJKoZIhvcNAQELBQAw\n" \
