@@ -4,18 +4,14 @@
 #include "log.h"
 #include "nvs.h"
 
-#include <ctype.h>
 #include <esp_http_client.h>
 #include <esp_https_ota.h>
-#include <esp_log.h>
-#include <esp_system.h>
-#include <nvs_flash.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/param.h>
 
 char *ota_server = OTA_DEFAULT_SERVER;
 char *ota_device_key = NULL;
+
+esp_err_t
+_http_client_init_cb (esp_http_client_handle_t client);
 
 void
 ota_init (const char *key) {
@@ -36,7 +32,9 @@ ota_check (const char *firmware_id) {
 
   esp_http_client_handle_t client = esp_http_client_init(&config);
 
-  esp_http_client_set_header(client, "x-ota-device", ota_device_key);
+  if (ota_device_key != NULL) {
+    esp_http_client_set_header(client, "x-ota-device", ota_device_key);
+  }
 
   esp_err_t err = esp_http_client_perform(client);
 
@@ -111,14 +109,11 @@ ota_update (const char *url) {
   return esp_https_ota(&ota_config);
 }
 
-void
-ota_verbose (bool state) {
-  _ota_verbose = state;
-}
-
 esp_err_t
 _http_client_init_cb (esp_http_client_handle_t client) {
-  esp_http_client_set_header(client, "x-ota-device", ota_device_key);
+  if (ota_device_key != NULL) {
+    esp_http_client_set_header(client, "x-ota-device", ota_device_key);
+  }
 
   return ESP_OK;
 }
