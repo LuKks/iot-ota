@@ -5,22 +5,20 @@
 extern "C" {
 #endif
 
-#include "../src/root_ca.h"
-
 #include <esp_err.h>
 #include <stdbool.h>
 
-#define OTA_ROOT_CA \
-  OTA_ROOT_CA_LETS_ENCRYPT_R3 \
-  OTA_ROOT_CA_GOOGLE_R1
-
-bool ota_verbose;
+uint8_t *ota_device_id;
+uint8_t *ota_device_key;
 
 void
-ota_init (const char *api_key);
+ota_set_server (const char *url);
 
 void
-ota_check (const char *firmware_id);
+ota_init (const char *firmware_id);
+
+void
+ota_check ();
 
 esp_err_t
 ota_update (const char *url);
