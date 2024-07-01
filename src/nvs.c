@@ -2,9 +2,10 @@
 
 #include <esp_err.h>
 #include <nvs_flash.h>
+#include <stdbool.h>
 
 void
-ota_nvs_create (const char *space) {
+nvs_create (const char *space) {
   ESP_ERROR_CHECK(nvs_flash_init());
 
   nvs_handle_t nvs;
@@ -17,7 +18,7 @@ ota_nvs_create (const char *space) {
 }
 
 void
-ota_nvs_erase_all (const char *space) {
+nvs_purge (const char *space) {
   ESP_ERROR_CHECK(nvs_flash_init());
 
   nvs_handle_t nvs;
@@ -31,27 +32,7 @@ ota_nvs_erase_all (const char *space) {
 }
 
 void
-ota_nvs_erase_key (const char *space, const char *key) {
-  ESP_ERROR_CHECK(nvs_flash_init());
-
-  nvs_handle_t nvs;
-
-  ESP_ERROR_CHECK(nvs_open(space, NVS_READWRITE, &nvs));
-
-  esp_err_t err = nvs_erase_key(nvs, key);
-
-  if (err != ESP_ERR_NVS_NOT_FOUND) {
-    ESP_ERROR_CHECK(err);
-  }
-
-  ESP_ERROR_CHECK(nvs_commit(nvs));
-  nvs_close(nvs);
-
-  ESP_ERROR_CHECK(nvs_flash_deinit());
-}
-
-void
-ota_nvs_write_bytes (const char *space, const char *key, const uint8_t *value, size_t length) {
+nvs_write (const char *space, const char *key, const uint8_t *value, size_t length) {
   ESP_ERROR_CHECK(nvs_flash_init());
 
   nvs_handle_t nvs;
@@ -65,7 +46,7 @@ ota_nvs_write_bytes (const char *space, const char *key, const uint8_t *value, s
 }
 
 void
-ota_nvs_write_string (const char *space, const char *key, const char *value) {
+nvs_write_string (const char *space, const char *key, const char *value) {
   ESP_ERROR_CHECK(nvs_flash_init());
 
   nvs_handle_t nvs;
@@ -79,7 +60,7 @@ ota_nvs_write_string (const char *space, const char *key, const char *value) {
 }
 
 void
-ota_nvs_write_bool (const char *space, const char *key, bool value) {
+nvs_write_bool (const char *space, const char *key, bool value) {
   ESP_ERROR_CHECK(nvs_flash_init());
 
   nvs_handle_t nvs;
@@ -93,7 +74,7 @@ ota_nvs_write_bool (const char *space, const char *key, bool value) {
 }
 
 uint8_t *
-ota_nvs_read_bytes (const char *space, const char *key) {
+nvs_read (const char *space, const char *key) {
   ESP_ERROR_CHECK(nvs_flash_init());
 
   nvs_handle_t nvs;
@@ -124,7 +105,7 @@ ota_nvs_read_bytes (const char *space, const char *key) {
 }
 
 char *
-ota_nvs_read_string (const char *space, const char *key) {
+nvs_read_string (const char *space, const char *key) {
   ESP_ERROR_CHECK(nvs_flash_init());
 
   nvs_handle_t nvs;
@@ -155,7 +136,7 @@ ota_nvs_read_string (const char *space, const char *key) {
 }
 
 bool
-ota_nvs_read_bool (const char *space, const char *key) {
+nvs_read_bool (const char *space, const char *key) {
   ESP_ERROR_CHECK(nvs_flash_init());
 
   nvs_handle_t nvs;
@@ -180,4 +161,24 @@ ota_nvs_read_bool (const char *space, const char *key) {
   ESP_ERROR_CHECK(nvs_flash_deinit());
 
   return value ? true : false;
+}
+
+void
+nvs_delete (const char *space, const char *key) {
+  ESP_ERROR_CHECK(nvs_flash_init());
+
+  nvs_handle_t nvs;
+
+  ESP_ERROR_CHECK(nvs_open(space, NVS_READWRITE, &nvs));
+
+  esp_err_t err = nvs_erase_key(nvs, key);
+
+  if (err != ESP_ERR_NVS_NOT_FOUND) {
+    ESP_ERROR_CHECK(err);
+  }
+
+  ESP_ERROR_CHECK(nvs_commit(nvs));
+  nvs_close(nvs);
+
+  ESP_ERROR_CHECK(nvs_flash_deinit());
 }
