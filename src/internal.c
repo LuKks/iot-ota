@@ -1,7 +1,9 @@
 #include "internal.h"
 
+#include <stdio.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 char *
 bytes_to_hex (const uint8_t *buffer, size_t size) {

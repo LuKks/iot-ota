@@ -27,7 +27,7 @@ static esp_err_t
 ota_download_and_update (const char *url);
 
 void
-ota_set_server (const char *url) {
+ota_set_server (char *url) {
   ota_server = url;
 }
 
@@ -253,7 +253,7 @@ ota_download_and_update (const char *url) {
     return -1;
   }
 
-  esp_err_t ota_perform_err = NULL;
+  esp_err_t ota_perform_err;
   uint progress = 0;
 
   while (true) {

@@ -1,8 +1,9 @@
 #include "random.h"
 
-#include <esp_system.h>
+#include <esp_random.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 void
 random_bytes_fill (uint8_t *buffer, size_t size) {

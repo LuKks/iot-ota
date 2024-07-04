@@ -9,7 +9,7 @@ extern "C" {
 #include <stdbool.h>
 
 void
-ota_set_server (const char *url);
+ota_set_server (char *url);
 
 void
 ota_updates (const char *firmware_id);
