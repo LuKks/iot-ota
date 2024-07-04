@@ -9,13 +9,12 @@ extern "C" {
 #include <stdbool.h>
 
 uint8_t *ota_device_id;
-uint8_t *ota_device_key;
 
 void
 ota_set_server (const char *url);
 
 void
-ota_init (const char *firmware_id);
+ota_updates (const char *firmware_id);
 
 int
 ota_check (char *out_firmware_hash, size_t out_size);
