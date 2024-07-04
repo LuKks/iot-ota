@@ -53,3 +53,7 @@ Run updates on background. It also generates and saves a random device ID.
 When you pass a firmware id, it always gets saved in the NVS.
 
 Later you can pass NULL, and it will reuse the one already saved.
+
+## License
+
+MIT
