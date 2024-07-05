@@ -78,7 +78,7 @@ ota_updates (const char *firmware_id) {
 
   ota__ensure_firmware_exists();
 
-  xTaskCreate(ota_task, "ota_task", 4096, NULL, 4, NULL);
+  xTaskCreate(ota_task, "ota_task", 8192, NULL, 4, NULL);
 }
 
 static void
