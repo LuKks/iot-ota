@@ -27,6 +27,15 @@ pow_two (int n);
 int
 retry_delay (int delay, int max, int *retries);
 
+void
+log_heap (const char *text);
+
+void
+log_min_heap (const char *text);
+
+void
+log_min_stack (const char *text);
+
 #ifdef __cplusplus
 }
 #endif
