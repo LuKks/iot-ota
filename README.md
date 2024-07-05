@@ -4,10 +4,8 @@ Firmware OTA updates library in C for IoT devices
 
 ## Usage
 
-Depends on:
-
 - [ota-backend](https://github.com/lukks/ota-backend) for hosting firmwares.
-- [ota-update](https://github.com/lukks/ota-update) to interact with the backend.
+- [ota-update](https://github.com/lukks/ota-update) to upload firmwares.
 
 ```c
 #include <WiFi.h>
@@ -15,8 +13,7 @@ Depends on:
 
 #define FIRMWARE_ID "<firmware id>"
 
-void
-setup () {
+void setup () {
   Serial.begin(115200);
 
   WiFi.begin("<wifi ssid>", "<wifi pass>");
@@ -29,10 +26,9 @@ setup () {
   ota_updates(FIRMWARE_ID);
 }
 
-void
-loop () {
-  Serial.println("loop()");
-  delay(999999);
+void loop () {
+  Serial.println("Hello World!");
+  delay(1000);
 }
 ```
 

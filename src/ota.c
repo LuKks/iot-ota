@@ -91,6 +91,7 @@ ota_task (void *params) {
 
     if (status_code == OTA_STATUS_NOT_FOUND) {
       ESP_LOGE(TAG, "Firmware not found");
+
       vTaskDelay(retry_delay(1000, 10, &retries) / portTICK_PERIOD_MS);
       continue;
     }
@@ -101,7 +102,6 @@ ota_task (void *params) {
 
       retries = 0;
       vTaskDelay(10000 / portTICK_PERIOD_MS);
-
       continue;
     }
 
@@ -114,7 +114,8 @@ ota_task (void *params) {
       esp_err_t err_download = ota_download_and_update(url);
 
       if (err_download != ESP_OK) {
-        ESP_LOGE(TAG, "Download request, failed to update: %d", err_download);
+        ESP_LOGE(TAG, "ota_download_and_update() Failed to update: %d", err_download);
+
         vTaskDelay(retry_delay(1000, 10, &retries) / portTICK_PERIOD_MS);
         continue;
       }
@@ -129,15 +130,13 @@ ota_task (void *params) {
       continue;
     }
 
-    ESP_LOGE(TAG, "Check request, unknown status: %d", status_code);
+    ESP_LOGE(TAG, "ota_check() Unknown status: %d", status_code);
 
     vTaskDelay(retry_delay(1000, 10, &retries) / portTICK_PERIOD_MS);
-
     continue;
   }
 }
 
-// TODO: Lots of tmp logs due strange panic when using a different server
 static int
 ota_check (char *out_firmware_hash, size_t out_size) {
   char *current_hash = nvs_read_string("ota", "hash");
@@ -157,7 +156,6 @@ ota_check (char *out_firmware_hash, size_t out_size) {
   esp_http_client_handle_t client = esp_http_client_init(&http_config);
 
   if (client == NULL) {
-    ESP_LOGE(TAG, "Check request, failed to create client");
     return -1;
   }
 
@@ -171,39 +169,33 @@ ota_check (char *out_firmware_hash, size_t out_size) {
   esp_err_t err = esp_http_client_set_method(client, HTTP_METHOD_GET);
 
   if (err != ESP_OK) {
-    ESP_LOGE(TAG, "Check request, failed to set method: %s", esp_err_to_name(err));
     esp_http_client_cleanup(client);
-    return -1;
+    return -2;
   }
 
   err = esp_http_client_open(client, 0);
 
   if (err != ESP_OK) {
-    ESP_LOGE(TAG, "Check request, failed to open: %s", esp_err_to_name(err));
     esp_http_client_cleanup(client);
-    return -1;
+    return -3;
   }
 
   int content_length = esp_http_client_fetch_headers(client);
 
   if (content_length < 0) {
-    ESP_LOGE(TAG, "Check request, headers failed (%d): %s", content_length, esp_err_to_name(content_length));
     esp_http_client_cleanup(client);
-    return -1;
+    return -4;
   }
 
   int status_code = esp_http_client_get_status_code(client);
-
-  ESP_LOGI(TAG, "Check request, status code: %d", status_code);
 
   if (status_code == OTA_STATUS_AVAILABLE) {
     int read_len = esp_http_client_read_response(client, out_firmware_hash, out_size - 1);
 
     if (read_len < 0) {
-      ESP_LOGE(TAG, "Check request, failed to read response");
       out_firmware_hash[0] = '\0';
       esp_http_client_cleanup(client);
-      return -1;
+      return -5;
     }
 
     out_firmware_hash[read_len] = '\0';
@@ -232,23 +224,19 @@ ota_download_and_update (const char *url) {
     .url = url,
     .cert_pem = OTA_ROOT_CA,
     .timeout_ms = 5 * 60 * 1000,
-    // .keep_alive_enable = true,
   };
 
   esp_https_ota_config_t ota_config = {
     .http_config = &http_config,
     .http_client_init_cb = _http_client_init_cb,
-    // .partial_http_download = true,
-    // .max_http_request_size = 4 * 1024,
   };
 
-  ESP_LOGI(TAG, "ota begin");
+  ESP_LOGI(TAG, "ota_download_and_update() %s", url);
 
   esp_https_ota_handle_t handle = NULL;
   esp_err_t err = esp_https_ota_begin(&ota_config, &handle);
 
   if (err != ESP_OK) {
-    ESP_LOGE(TAG, "ota begin failed: %d (%s)", err, esp_err_to_name(err));
     esp_https_ota_abort(handle);
     return -1;
   }
@@ -261,7 +249,7 @@ ota_download_and_update (const char *url) {
 
     if (ota_perform_err == ESP_ERR_HTTPS_OTA_IN_PROGRESS) {
       if (progress++ % 32 == 0) {
-        ESP_LOGI(TAG, "ota in progress, image bytes read: %d", esp_https_ota_get_image_len_read(handle));
+        ESP_LOGI(TAG, "esp_https_ota_perform() Image bytes read: %d", esp_https_ota_get_image_len_read(handle));
       }
 
       continue;
@@ -271,22 +259,19 @@ ota_download_and_update (const char *url) {
   }
 
   if (ota_perform_err != ESP_OK) {
-    ESP_LOGE(TAG, "ota perform failed: %d (%s)", ota_perform_err, esp_err_to_name(ota_perform_err));
     esp_https_ota_abort(handle);
-    return -1;
+    return -2;
   }
 
   if (!esp_https_ota_is_complete_data_received(handle)) {
-    ESP_LOGE(TAG, "ota data was not fully received");
     esp_https_ota_abort(handle);
-    return -1;
+    return -3;
   }
 
   esp_err_t ota_finish_err = esp_https_ota_finish(handle);
 
   if (ota_finish_err != ESP_OK) {
-    ESP_LOGE(TAG, "ota finish failed: %d (%s) 0x%x", ota_finish_err, esp_err_to_name(ota_finish_err), ota_finish_err);
-    return -1;
+    return -4;
   }
 
   return ESP_OK;

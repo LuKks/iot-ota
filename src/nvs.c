@@ -3,6 +3,8 @@
 #include <esp_err.h>
 #include <nvs_flash.h>
 #include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 void
 nvs_create (const char *space) {

@@ -5,9 +5,6 @@
 extern "C" {
 #endif
 
-#include <esp_err.h>
-#include <stdbool.h>
-
 void
 ota_set_server (char *url);
 
