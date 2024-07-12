@@ -7,7 +7,6 @@ BinPackArguments: false
 BinPackParameters: false
 ContinuationIndentWidth: 2
 ColumnLimit: 0
-IncludeBlocks: Regroup
 SpaceAfterCStyleCast: true
 SpaceBeforeParens: Custom
 SpaceBeforeParensOptions:

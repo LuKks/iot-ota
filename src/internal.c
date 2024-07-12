@@ -1,11 +1,12 @@
-#include "internal.h"
-
-#include <esp_log.h>
-#include <freertos/FreeRTOS.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <esp_log.h>
+#include <freertos/FreeRTOS.h>
+
+#include "internal.h"
 
 const char *TAG = "OTA_INTERNAL";
 

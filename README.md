@@ -1,6 +1,6 @@
 # ota
 
-Firmware OTA updates library in C for IoT devices
+Firmware OTA updates in C for IoT devices
 
 ## Usage
 

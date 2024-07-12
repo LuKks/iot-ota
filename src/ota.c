@@ -1,15 +1,16 @@
-#include "../include/ota.h"
-
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "internal.h"
-#include "nvs.h"
-#include "random.h"
-#include "root_ca.h"
-
 #include <esp_http_client.h>
 #include <esp_https_ota.h>
 #include <esp_log.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+#include <nvs_flash.h>
+
+#include <iot_crypto.h>
+#include <iot_nvs.h>
+
+#include "../include/ota.h"
+#include "internal.h"
+#include "root_ca.h"
 
 static const char *TAG = "OTA";
 
@@ -33,12 +34,14 @@ ota_set_server (char *url) {
 
 static void
 ota_init () {
+  ESP_ERROR_CHECK(nvs_flash_init());
+
   nvs_create("ota");
 
   ota_device_id = nvs_read("ota", "id");
 
   if (ota_device_id == NULL) {
-    ota_device_id = random_bytes(32);
+    ota_device_id = crypto_random_bytes(32);
     nvs_write("ota", "id", ota_device_id, sizeof(ota_device_id));
   }
 }
