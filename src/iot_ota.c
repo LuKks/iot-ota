@@ -1,6 +1,7 @@
 #include <esp_http_client.h>
 #include <esp_https_ota.h>
 #include <esp_log.h>
+#include <esp_netif.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <nvs_flash.h>
@@ -34,6 +35,7 @@ ota_set_server (char *url) {
 
 static void
 ota_init () {
+  ESP_ERROR_CHECK(esp_netif_init());
   ESP_ERROR_CHECK(nvs_flash_init());
 
   nvs_create("ota");
