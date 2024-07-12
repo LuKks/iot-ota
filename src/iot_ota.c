@@ -8,7 +8,7 @@
 #include <iot_crypto.h>
 #include <iot_nvs.h>
 
-#include "../include/ota.h"
+#include "../include/iot_ota.h"
 #include "internal.h"
 #include "root_ca.h"
 

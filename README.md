@@ -1,4 +1,4 @@
-# ota
+# iot-ota
 
 Firmware OTA updates in C for IoT devices
 
@@ -9,7 +9,7 @@ Firmware OTA updates in C for IoT devices
 
 ```c
 #include <WiFi.h>
-#include <ota.h>
+#include <iot_ota.h>
 
 #define FIRMWARE_ID "<firmware id>"
 
@@ -34,7 +34,7 @@ void loop () {
 
 ## API
 
-See [`include/ota.h`](include/ota.h) for the public API.
+See [`include/iot_ota.h`](include/iot_ota.h) for the public API.
 
 #### `ota_set_server(url)`
 

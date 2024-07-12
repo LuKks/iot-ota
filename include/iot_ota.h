@@ -1,5 +1,5 @@
-#ifndef OTA_H
-#define OTA_H
+#ifndef IOT_OTA_H
+#define IOT_OTA_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,4 +15,4 @@ ota_updates (const char *firmware_id);
 }
 #endif
 
-#endif // OTA_H
+#endif // IOT_OTA_H
