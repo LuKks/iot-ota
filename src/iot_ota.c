@@ -1,3 +1,4 @@
+#include <esp_crt_bundle.h>
 #include <esp_http_client.h>
 #include <esp_https_ota.h>
 #include <esp_log.h>
@@ -11,7 +12,6 @@
 
 #include "../include/iot_ota.h"
 #include "internal.h"
-#include "root_ca.h"
 
 static const char *TAG = "OTA";
 
@@ -155,7 +155,8 @@ ota_check (char *out_firmware_hash, size_t out_size) {
 
   esp_http_client_config_t http_config = {
     .url = url,
-    .cert_pem = OTA_ROOT_CA,
+    .transport_type = HTTP_TRANSPORT_OVER_SSL,
+    .crt_bundle_attach = esp_crt_bundle_attach,
   };
 
   esp_http_client_handle_t client = esp_http_client_init(&http_config);
@@ -227,8 +228,9 @@ static esp_err_t
 ota_download_and_update (const char *url) {
   esp_http_client_config_t http_config = {
     .url = url,
-    .cert_pem = OTA_ROOT_CA,
     .timeout_ms = 5 * 60 * 1000,
+    .transport_type = HTTP_TRANSPORT_OVER_SSL,
+    .crt_bundle_attach = esp_crt_bundle_attach,
   };
 
   esp_https_ota_config_t ota_config = {
